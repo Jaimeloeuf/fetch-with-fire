@@ -149,9 +149,9 @@ const methods = {
 /**
  * Module's methods only exported through setup.
  * @function setup
- * @param {function} firebaseAuth Base API URL
+ * @param {function} firebaseAuth The same firebase auth function that ran initializeApp()
  * @param {string} apiUrl Base API URL
- * @param {function} errorHandler Base API URL
+ * @param {function} errorHandler Error handling function for when the fetch failed
  */
 
 //  Accept in the firebase instance???

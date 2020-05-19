@@ -1,8 +1,11 @@
 {
   "name": "fetch-with-fire",
-  "version": "0.1.0",
-  "description": "Extends browser \"fetch\" API with firebase auth built in",
+  "version": "0.1.1",
+  "description": "Extends browsers' \"fetch\" API with firebase auth built in",
   "main": "./src/index.js",
+  "files": [
+    "/src"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
