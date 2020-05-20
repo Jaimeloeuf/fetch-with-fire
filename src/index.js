@@ -6,12 +6,6 @@
 // Throws an error and prevent module from being used if fetch is not available
 if (!window.fetch) throw new Error("FETCH API NOT AVAILABLE ON BROWSER");
 
-// Internal firebase auth instance that must be set via setup() so that the library and your app share the same auth instance
-let _firebaseAuth;
-
-// Internal base API URL that must be set via setup()
-let _apiUrl;
-
 // Default internal error handler function that can be overwritten via setup()
 let _errorHandler = (error) => {
   console.error(error);
@@ -40,10 +34,11 @@ async function getParsedResponse(response) {
 /**
  * Inner fetch function used to prepend API base URL and parse the response
  * @function _fetch
+ * @param {String} _apiUrl path of the API only, the base API will be prepended
  * @param {String} url path of the API only, the base API will be prepended
  * @param {object} init Request object required by fetch
  */
-async function _fetch(url = "", init) {
+async function _fetch(_apiUrl, url = "", init) {
   try {
     // Call window fetch with prepended API URL and default request object
     const response = await window.fetch(_apiUrl + url, init);
@@ -65,25 +60,27 @@ async function _fetch(url = "", init) {
  * Only returns authentication header if user is authenticated.
  * Split out so if user is unauthenticated, this does not throw if currenUser is null
  * @function getAuthHeader
+ * @param {function} firebaseAuth Firebase auth method
  * @returns {String} Authentication header or nothing.
  */
-async function getAuthHeader() {
-  if (_firebaseAuth().currentUser)
-    return `Bearer ${await _firebaseAuth().currentUser.getIdToken()}`;
+async function getAuthHeader(firebaseAuth) {
+  if (firebaseAuth().currentUser)
+    return `Bearer ${await firebaseAuth().currentUser.getIdToken()}`;
 }
 
 /**
  * GET curried function that takes a init object before an URL
  */
-function _get(init = {}) {
+function _get(apiUrl, init = {}, firebaseAuth) {
   return async function (url) {
     return _fetch(
+      apiUrl,
       url,
       Object.assign(
         {
           method: "GET",
           headers: {
-            Authorization: await getAuthHeader(),
+            Authorization: await getAuthHeader(firebaseAuth),
           },
         },
         init
@@ -95,18 +92,19 @@ function _get(init = {}) {
 /**
  * POST curried function that takes a init object before an URL and data
  */
-function _post(init = {}) {
+function _post(apiUrl, init = {}, firebaseAuth) {
   return async function (url, data) {
     if (data) init.body = JSON.stringify(data);
 
     return _fetch(
+      apiUrl,
       url,
       Object.assign(
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: await getAuthHeader(),
+            Authorization: await getAuthHeader(firebaseAuth),
           },
         },
         init
@@ -116,54 +114,47 @@ function _post(init = {}) {
 }
 
 /**
- * Function to modify the init object only once before making a new request
- * @param {object} init Request object for fetch
- * @returns {object} Same API object with custom request object partially applied.
- */
-function modify(init = {}) {
-  // Return the http methods to chain it and make a request
-  return {
-    get: _get(init),
-    post: _post(init),
-  };
-}
-
-/**
- * Fetch methods
- * @notice Suggested to import the package under the "api" name to avoid collision with window.fetch
- *
- * @example
- * api.get(url)
- * api.modify(custom request object).get(url)
- * api.post(url, data)
- * api.modify(custom request object).post(url, data)
- *
- * @notice GET/POST methods are basically _get/_post with no init objects applied
- */
-const methods = {
-  get: _get(),
-  post: _post(),
-  modify,
-};
-
-/**
  * Module's methods only exported through setup.
  * @function setup
  * @param {function} firebaseAuth The same firebase auth function that ran initializeApp()
  * @param {string} apiUrl Base API URL
  * @param {function} errorHandler Error handling function for when the fetch failed
  */
-
-//  Accept in the firebase instance???
 export default function setup(firebaseAuth, apiUrl, errorHandler) {
-  // Set the module's internal firebase auth instance
-  _firebaseAuth = firebaseAuth;
-
+  // Internal firebase auth instance that must be set to share the same auth instance between this library and your app
   // Set the module's internal base api URL
-  _apiUrl = apiUrl;
 
   // Only set the error handler if defined, else keep the default handler
   if (errorHandler) _errorHandler = errorHandler;
 
-  return methods;
+  /**
+   * Function to modify the init object only once before making a new request
+   * @param {object} init Request object for fetch
+   * @returns {object} Same API object with custom request object partially applied.
+   */
+  function modify(init = {}, _firebaseAuth = firebaseAuth) {
+    // Return the http methods to chain it and make a request
+    return {
+      get: _get(apiUrl, init, _firebaseAuth),
+      post: _post(apiUrl, init, _firebaseAuth),
+    };
+  }
+
+  /**
+   * Fetch methods
+   * @notice Suggested to import the package under the "api" name to avoid collision with window.fetch
+   *
+   * @example
+   * api.get(url)
+   * api.modify(custom request object).get(url)
+   * api.post(url, data)
+   * api.modify(custom request object).post(url, data)
+   *
+   * @notice GET/POST methods are basically _get/_post with no init objects applied
+   */
+  return {
+    get: _get(apiUrl, undefined, firebaseAuth),
+    post: _post(apiUrl, undefined, firebaseAuth),
+    modify,
+  };
 }
