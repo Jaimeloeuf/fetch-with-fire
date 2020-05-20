@@ -1,6 +1,6 @@
 {
   "name": "fetch-with-fire",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Extends browsers' \"fetch\" API with firebase auth built in",
   "main": "./src/index.js",
   "files": [
@@ -25,5 +25,8 @@
   "bugs": {
     "url": "https://github.com/Enkel-Digital/fetch-with-fire/issues"
   },
-  "homepage": "https://github.com/Enkel-Digital/fetch-with-fire#readme"
+  "homepage": "https://github.com/Enkel-Digital/fetch-with-fire#readme",
+  "dependencies": {
+    "deepmerge": "^4.2.2"
+  }
 }
