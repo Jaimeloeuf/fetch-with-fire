@@ -3,59 +3,27 @@
  * @author JJ
  */
 
-import deepmerge from "deepmerge";
-
 // Throws an error and prevent module from being used if fetch is not available
 if (!window.fetch) throw new Error("FETCH API NOT AVAILABLE ON BROWSER");
 
-/**
- * Parse the body of the response (can either be JSON or text) to an object with type indicating properties
- * @function getParsedResponse
- * @param {*} response
- * @returns {object} Returns object with either parsed JSON or string. Check type using parsedResponse.json or parsedResponse.string
- */
-async function getParsedResponse(response) {
-  try {
-    // API reference https://developer.mozilla.org/en-US/docs/Web/API/Body/json
-    // Read the stream from the cloned response, as the stream can only be read once and
-    // if this fails we need to use the stream again for text() reading
-    return { json: true, response: await response.clone().json() };
-  } catch (_) {
-    // API reference https://developer.mozilla.org/en-US/docs/Web/API/Body/text
-    return { string: true, response: await response.text() };
-  }
-}
+import deepmerge from "deepmerge";
+
+import getParsedResponse from "./getParsedResponse";
+import getAuthHeader from "./getAuthHeader";
 
 /**
- * Only returns authentication header if user is authenticated.
- * Split out so if user is unauthenticated, this does not throw if currenUser is null
- * @function getAuthHeader
- * @param {function} [firebaseAuth] Firebase auth method
- * @returns {String} Authentication header or nothing.
- */
-async function getAuthHeader(firebaseAuth) {
-  if (firebaseAuth().currentUser)
-    return `Bearer ${await firebaseAuth().currentUser.getIdToken()}`;
-}
-
-function defaultErrorHandler(error) {
-  // Default internal error handler function that can be overwritten via setup()
-
-  // @todo Add a environment check to only do this if not production
-  console.error(error);
-  // Allow error to bubble back to function caller
-  return error;
-}
-
-/**
- * Suggested to import the package under the "api" name to avoid collision with window.fetch
+ * Suggestion: import package as "api" to avoid name collision with window.fetch
  *
  * @example
+ * import firebase from "firebase/app";
+ * import "firebase/auth";
+ * const api = new fetch(firebase.auth, apiUrl, (error) => {
+ *  console.error(error);
+ *  return error;
+ * });
  * api.get(url)
  * api.modify(custom request object).get(url)
  * api.post(url, data)
- *
- * @notice GET/POST methods are basically _get/_post with no init objects applied
  */
 export default class fetch {
   /**
@@ -75,7 +43,7 @@ export default class fetch {
 
     // Only set the error handler if defined, else keep the default handler
     if (errorHandler) this._errorHandler = errorHandler;
-    else this._errorHandler = defaultErrorHandler;
+    else this._errorHandler = import("./defaultErrorHandler");
 
     this.get = this._get(undefined, firebaseAuth);
     this.post = this._post(undefined, firebaseAuth);
