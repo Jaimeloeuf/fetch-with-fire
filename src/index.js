@@ -47,6 +47,9 @@ export default class fetch {
 
     this.get = this._get(undefined, firebaseAuth);
     this.post = this._post(undefined, firebaseAuth);
+    this.patch = this._patch(undefined, firebaseAuth);
+    this.put = this._put(undefined, firebaseAuth);
+    this.delete = this._delete(undefined, firebaseAuth);
   }
 
   /**
@@ -106,6 +109,79 @@ export default class fetch {
         deepmerge(
           {
             method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: await getAuthHeader(this._firebaseAuth),
+            },
+          },
+          init
+        )
+      );
+    };
+  }
+
+  /**
+   * PATCH curried function that takes a init object before an URL and data
+   */
+  _patch(init = {}) {
+    // Arrow function to inherit "this", without using explicit "this" binding
+    return async (url, data) => {
+      if (data) init.body = JSON.stringify(data);
+
+      return this._fetch(
+        url,
+        deepmerge(
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: await getAuthHeader(this._firebaseAuth),
+            },
+          },
+          init
+        )
+      );
+    };
+  }
+
+  /**
+   * PUT curried function that takes a init object before an URL and data
+   */
+  _put(init = {}) {
+    // Arrow function to inherit "this", without using explicit "this" binding
+    return async (url, data) => {
+      if (data) init.body = JSON.stringify(data);
+
+      return this._fetch(
+        url,
+        deepmerge(
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: await getAuthHeader(this._firebaseAuth),
+            },
+          },
+          init
+        )
+      );
+    };
+  }
+
+  /**
+   * DELETE curried function that takes a init object before an URL and data
+   * It is not recommended to include a request message body even though you are able to
+   */
+  _delete(init = {}) {
+    // Arrow function to inherit "this", without using explicit "this" binding
+    return async (url, data) => {
+      if (data) init.body = JSON.stringify(data);
+
+      return this._fetch(
+        url,
+        deepmerge(
+          {
+            method: "DELETE",
             headers: {
               "Content-Type": "application/json",
               Authorization: await getAuthHeader(this._firebaseAuth),
