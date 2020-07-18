@@ -10,6 +10,7 @@ import deepmerge from "deepmerge";
 
 import getParsedResponse from "./getParsedResponse";
 import getAuthHeader from "./getAuthHeader";
+import defaultErrorHandler from "./defaultErrorHandler";
 
 /**
  * Suggestion: import package as "api" to avoid name collision with window.fetch
@@ -43,7 +44,7 @@ export default class fetch {
 
     // Only set the error handler if defined, else keep the default handler
     if (errorHandler) this._errorHandler = errorHandler;
-    else this._errorHandler = import("./defaultErrorHandler");
+    else this._errorHandler = defaultErrorHandler;
 
     this.get = this._get(undefined, firebaseAuth);
     this.post = this._post(undefined, firebaseAuth);
@@ -110,7 +111,7 @@ export default class fetch {
           {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": data ? "application/json" : undefined,
               Authorization: await getAuthHeader(this._firebaseAuth),
             },
           },
@@ -134,7 +135,7 @@ export default class fetch {
           {
             method: "PATCH",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": data ? "application/json" : undefined,
               Authorization: await getAuthHeader(this._firebaseAuth),
             },
           },
@@ -158,7 +159,7 @@ export default class fetch {
           {
             method: "PUT",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": data ? "application/json" : undefined,
               Authorization: await getAuthHeader(this._firebaseAuth),
             },
           },
@@ -183,7 +184,7 @@ export default class fetch {
           {
             method: "DELETE",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": data ? "application/json" : undefined,
               Authorization: await getAuthHeader(this._firebaseAuth),
             },
           },
