@@ -1,8 +1,8 @@
 {
   "name": "fetch-with-fire",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "Extends browsers' \"fetch\" API with firebase auth built in",
-  "main": "./dist/index.js",
+  "module": "./src/index.js",
   "files": [
     "/dist"
   ],
