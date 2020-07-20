@@ -46,11 +46,14 @@ export default class fetch {
     if (errorHandler) this._errorHandler = errorHandler;
     else this._errorHandler = defaultErrorHandler;
 
-    this.get = this._get(undefined, firebaseAuth);
-    this.post = this._post(undefined, firebaseAuth);
-    this.patch = this._patch(undefined, firebaseAuth);
-    this.put = this._put(undefined, firebaseAuth);
-    this.delete = this._delete(undefined, firebaseAuth);
+    // Empty factory function calls to use default empty object
+    this.get = this._get();
+    this.post = this._post();
+    this.patch = this._patch();
+    this.put = this._put();
+    this.delete = this._delete();
+  }
+
   }
 
   /**
@@ -207,6 +210,9 @@ export default class fetch {
     return {
       get: this._get(init),
       post: this._post(init),
+      patch: this._get(init),
+      put: this._post(init),
+      delete: this._post(init),
     };
   }
 }
