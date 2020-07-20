@@ -215,4 +215,24 @@ export default class fetch {
       delete: this._post(init),
     };
   }
+
+  /**
+   * USE WITH CAUTION
+   * Function to modify init objects permanently for ALL methods
+   * @param {object} init Request object for fetch
+   * @returns {object} Same object with updated methods with new custom request object partially applied.
+   *
+   * @example
+   * api.modifyPermanently(custom request object).post(url, data)
+   */
+  modifyPermanently(init) {
+    this.get = this._get(init);
+    this.post = this._post(init);
+    this.patch = this._get(init);
+    this.put = this._post(init);
+    this.delete = this._post(init);
+
+    // Return object to allow caller to chain this method
+    return this;
+  }
 }
