@@ -54,6 +54,14 @@ export default class fetch {
     this.delete = this._delete();
   }
 
+  /**
+   * USE WITH CAUTION. If you set a new base URL, this will affect every other call out there.
+   * --- Experimental --- Might be removed in future versions. DO NOT depend on this
+   * @param {string} apiUrl Base API URL
+   */
+  __setBaseUrl(apiUrl) {
+    // Set the module's internal base api URL
+    this._apiUrl = apiUrl;
   }
 
   /**
