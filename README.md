@@ -1,3 +1,7 @@
+# DEPRECATED
+`fetch-with-fire` library is fully deprecated. No new changes are expected to land. In fact, none have landed for some time.  
+This is deprecated because [simpler-fetch](https://github.com/Enkel-Digital/simpler-fetch/) turned out to be a much better alternative and can do exactly what this library intends to achieve too, which is to make it easier to work with firebase auth. See this [documentation](https://github.com/Enkel-Digital/simpler-fetch/blob/master/firebase-auth.md) on using `simpler-fetch` with firebase auth to migrate!
+
 # fetch-with-fire
 Fetch module that extends the browsers' fetch method to interact with backend with firebase auth tokens.  
 Your project is assumed to be using firebase auth as the stateless auth system.  
